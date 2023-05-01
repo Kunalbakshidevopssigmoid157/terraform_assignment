@@ -56,13 +56,13 @@ resource "aws_internet_gateway" "kunal-igw" {
 # Creating Route Tables for Internet gateway
 resource "aws_route_table" "kunal-public" {
   vpc_id = aws_vpc.kunal.id
+  
   route {
-     cidr_block = "0.0.0.0/0"
-     gateway_id = aws_internet_gateway.kunal-igw.id
-    }
+    cidr_block = "0.0.0.0/0"
+    gateway_id = aws_internet_gateway.kunal-igw.id
+  }
   
   
-
   tags = {
     Name = "kunal-public"
   }
@@ -92,7 +92,7 @@ resource "aws_route_table" "kunal-private" {
       cidr_block     = "0.0.0.0/0"
       nat_gateway_id = aws_nat_gateway.nat-gw.id
     }
-   
+  
   
 
   tags = {
@@ -120,11 +120,11 @@ resource "tls_private_key" "rsa" {
 # Storing private key in localfile
 resource "local_file" "ssh-private-key" {
   content  = tls_private_key.rsa.private_key_pem
-  filename = "ssh-private-key"
+  filename = "ssh-private-key.pem"
 }
 # Creation of Security group
-resource "aws_security_group" "security-group" {
-  name        = "security-group"
+resource "aws_security_group" "public-security-group" {
+  name        = "public-security-group"
   description = "security group"
   vpc_id      = "${aws_vpc.kunal.id}"
   
@@ -136,8 +136,8 @@ resource "aws_security_group" "security-group" {
   }
 
   ingress{
-    from_port = 81
-    to_port = 81
+    from_port = 443
+    to_port = 443
     protocol = "tcp"
     cidr_blocks = ["0.0.0.0/0"]
   }
@@ -159,6 +159,8 @@ resource "aws_security_group" "security-group" {
     Name = "security-group"
   }
 }
+
+
 output "aws_security_gr_id" {
   value = "{$aws_security_group.security-group.id}"
 }
@@ -166,14 +168,14 @@ output "aws_security_gr_id" {
 resource "aws_instance" "public_instance-1" {
   ami           = "ami-02eb7a4783e7e9317"
   instance_type = "t2.micro"
-  vpc_security_group_ids = [ "${aws_security_group.security-group.id}" ]
+  vpc_security_group_ids = [ "${aws_security_group.public-security-group.id}" ]
   subnet_id = "${aws_subnet.kunal-public.id}"
   key_name = "ssh-private-key"
   associate_public_ip_address = true
   tags = {
     Name = "kunal-public-1"
   }
-  user_data = file("userdata.tpl")
+  
 }
 
 #EC2 Instances Private Subnets
@@ -181,12 +183,13 @@ resource "aws_instance" "public_instance-1" {
 resource "aws_instance" "private_instance-1" {
   ami           = "ami-02eb7a4783e7e9317"
   instance_type = "t2.micro"
-  vpc_security_group_ids = [ "${aws_security_group.security-group.id}" ]
+  vpc_security_group_ids = [ "${aws_security_group.public-security-group.id}" ]
   subnet_id = "${aws_subnet.kunal-private.id}"
   key_name = "ssh-private-key"
   associate_public_ip_address = false
   tags = {
     Name = "kunal-private-1"
   }
+    user_data = file("userdata.tpl")
   
 }
