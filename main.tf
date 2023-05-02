@@ -175,7 +175,7 @@ resource "aws_instance" "public_instance-1" {
   tags = {
     Name = "kunal-public-1"
   }
-  
+  user_data = file("userdata.tpl")
 }
 
 #EC2 Instances Private Subnets
