@@ -2,10 +2,6 @@
 
 Jenkins Pineline
 
-# terraform_assignment
-
-Jenkins Pineline
-
 pipeline {
     agent any
     
