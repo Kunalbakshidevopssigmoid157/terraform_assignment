@@ -4,8 +4,6 @@ Jenkins Pineline
 
 pipeline {
     agent any
-   
-
     stages {
         stage('git connection') {
             steps {
@@ -18,13 +16,11 @@ pipeline {
                
                     sh "terraform init"
                     sh "terraform plan"
-                    sh "terraform apply --auto-approve"
-                   
-                
-                
-                  
+                    sh "terraform apply --auto-approve"     
             }
         }
     }
 }
 }
+
+
