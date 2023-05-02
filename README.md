@@ -19,15 +19,12 @@ pipeline {
         stage('terraform'){
             steps{
              //AWS Credentials{
-                script {
+              
                     sh "terraform init"
                     sh "terraform plan"
                     sh "terraform apply --auto-approve"
-                   def action = "${params.reply}"
-                   if (${action} == "yes") {
-                     sh "terraform destroy --auto-approve"
-                    }
-                }
+                   
+                
                 
                   
             }
