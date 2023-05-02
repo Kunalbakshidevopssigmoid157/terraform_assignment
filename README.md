@@ -4,7 +4,7 @@ Jenkins Pineline
 
 pipeline {
     agent any
-    
+   
 
     stages {
         stage('git connection') {
